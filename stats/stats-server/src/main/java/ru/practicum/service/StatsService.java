@@ -46,7 +46,7 @@ public class StatsService {
         for (var pair : rawHits.entrySet()) {
             var hitsStream = pair.getValue().stream().map(DbHitData::getIp);
             if (unique) hitsStream = hitsStream.distinct();
-            var hits = hitsStream.toList();
+            var hits = hitsStream.collect(Collectors.toList());
             var item = new HitOutput();
             item.setApp("ewm-main-service");
             item.setUri(pair.getKey());
@@ -54,6 +54,6 @@ public class StatsService {
             res.add(item);
         }
 
-        return res.stream().sorted(Comparator.comparingLong(hitOutput -> -hitOutput.getHits())).toList();
+        return res.stream().sorted(Comparator.comparingLong(hitOutput -> -hitOutput.getHits())).collect(Collectors.toList());
     }
 }

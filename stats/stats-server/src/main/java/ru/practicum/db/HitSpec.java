@@ -6,11 +6,12 @@ import ru.practicum.db.model.DbHitData;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class HitSpec {
     public static Specification<DbHitData> searchByUri(List<String> search) {
-        search = search.stream().filter(Objects::nonNull).toList();
+        search = search.stream().filter(Objects::nonNull).collect(Collectors.toList());
         return Specification.where(like(search));
     }
 

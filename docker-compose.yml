@@ -10,9 +10,9 @@ services:
     depends_on:
       - stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm
-      - spring.datasource.username=explore_with_me
-      - spring.datasource.password=root
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm-stat
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
       - spring.jpa.database=postgresql
 
   stats-db:
@@ -22,6 +22,32 @@ services:
       - "5432:5432"
     restart: always
     environment:
-      - POSTGRES_DB=ewm
+      - POSTGRES_DB=ewm-stat
+      - POSTGRES_USER=explore_with_me
+      - POSTGRES_PASSWORD=root
+
+  ewm-server:
+    build:
+      context: ./ewm-main-service
+      dockerfile: Dockerfile
+    container_name: ewm-main-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-main
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - spring.jpa.database=postgresql
+
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: ewm-db-main
+    ports:
+      - "6432:5432"
+    restart: always
+    environment:
+      - POSTGRES_DB=ewm-main
       - POSTGRES_USER=explore_with_me
       - POSTGRES_PASSWORD=root

@@ -10,7 +10,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class Dao {
-private final StatsRepo statsRepo;
+
+    private final StatsRepo statsRepo;
 
     public List<DbHitData> searchByUri(List<String> uri) {
         Specification<DbHitData> specification = Specification

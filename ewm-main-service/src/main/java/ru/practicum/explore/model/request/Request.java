@@ -1,11 +1,12 @@
-package ru.practicum.explore.model.event;
+package ru.practicum.explore.model.request;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
-import ru.practicum.explore.model.category.Category;
+import ru.practicum.explore.model.event.Event;
 import ru.practicum.explore.model.user.User;
 
 import javax.persistence.Entity;
@@ -21,35 +22,26 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "events")
+@Table(name = "requests")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Event {
+public class Request {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String annotation;
-    private String description;
-    private LocalDateTime createdOn;
-    private Location location;
-    private LocalDateTime eventDate;
-    private String title;
-    private boolean paid;
-    private boolean requestModeration;
-    private int participantLimit;
+    private LocalDateTime created;
     @ManyToOne
-    @JoinColumn(name = "initiator")
-    private User initiator;
+    @JoinColumn(name = "event")
+    private Event event;
     @ManyToOne
-    @JoinColumn(name = "category")
-    private Category category;
+    @JoinColumn(name = "requester")
+    private User requester;
+
     @Enumerated(EnumType.STRING)
-    private EventState state;
-    @Enumerated(EnumType.STRING)
-    private EventStateAction stateAction;
-    private boolean available;
+    private RequestStatus status;
 
     @Override
     public final boolean equals(Object o) {
@@ -58,8 +50,8 @@ public class Event {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Event event = (Event) o;
-        return getId() != null && Objects.equals(getId(), event.getId());
+        Request request = (Request) o;
+        return getId() != null && Objects.equals(getId(), request.getId());
     }
 
     @Override

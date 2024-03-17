@@ -5,10 +5,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import ru.practicum.explore.db.repo.CategoryRepo;
+import ru.practicum.explore.db.repo.CompilationRepo;
 import ru.practicum.explore.db.repo.EventRepo;
 import ru.practicum.explore.db.repo.RequestRepo;
 import ru.practicum.explore.db.repo.UserRepo;
 import ru.practicum.explore.model.category.Category;
+import ru.practicum.explore.model.compilation.Compilation;
 import ru.practicum.explore.model.event.Event;
 import ru.practicum.explore.model.event.EventState;
 import ru.practicum.explore.model.event.EventUpdateDto;
@@ -26,6 +28,7 @@ public class Dao {
     private final CategoryRepo categoryRepo;
     private final EventRepo eventRepo;
     private final RequestRepo requestRepo;
+    private final CompilationRepo compilationRepo;
 
     public User createUser(User user) {
         return userRepo.save(user);
@@ -77,6 +80,11 @@ public class Dao {
         return eventRepo.findByInitiator(user, pageRequest);
     }
 
+    public List<Event> getEventsByIds(List<Long> ids) {
+
+        return eventRepo.findByIdIn(ids);
+    }
+
     public Event getEventByUserAndEventId(User user, long eventId) {
         return eventRepo.findByInitiatorAndId(user, eventId);
     }
@@ -124,5 +132,27 @@ public class Dao {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         return eventRepo.findAll(specification, pageRequest).toList();
+    }
+
+    public Compilation saveCompilation(Compilation compilation) {
+        return compilationRepo.save(compilation);
+    }
+
+    public void deleteCompilation(Compilation compilation) {
+        compilationRepo.delete(compilation);
+    }
+
+    public Optional<Compilation> getCompilationById(Long id) {
+        return compilationRepo.findById(id);
+    }
+
+    public List<Compilation> findCompilations(Boolean pinned, int from, int size) {
+        Specification<Compilation> specification = Specification
+                .where(CompilationSpec.isPinned(pinned));
+
+        int page = from % size > 0 ? (from / size) + 1 : from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return compilationRepo.findAll(specification, pageRequest).toList();
     }
 }

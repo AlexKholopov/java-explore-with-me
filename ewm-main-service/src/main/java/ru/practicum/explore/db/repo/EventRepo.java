@@ -14,4 +14,6 @@ public interface EventRepo extends PagingAndSortingRepository<Event, Long>, JpaS
 
     Event findByInitiatorAndId(User initiator, Long id);
 
+    List<Event> findByIdIn(List<Long> ids);
+
 }

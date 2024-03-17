@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.explore.model.category.CategoryDto;
+import ru.practicum.explore.model.compilation.CompilationInput;
+import ru.practicum.explore.model.compilation.CompilationOutput;
 import ru.practicum.explore.model.user.UserDto;
 import ru.practicum.explore.service.categoryService.CategoryService;
+import ru.practicum.explore.service.copilationService.CompilationService;
 import ru.practicum.explore.service.userService.UserService;
 
 import javax.validation.Valid;
@@ -26,6 +29,8 @@ import java.util.List;
 public class AdminRestHandler {
     private final UserService userService;
     private final CategoryService categoryService;
+    private final CompilationService compilationService;
+
     @PostMapping("/users")
     public UserDto createUser (@RequestBody @Valid UserDto userDto) {
         return userService.createUser(userDto);
@@ -58,4 +63,18 @@ public class AdminRestHandler {
         return categoryService.updateCategory(categoryDto);
     }
 
+    @PostMapping("/compilations")
+    public CompilationOutput createCompilation(@RequestBody CompilationInput compilationInput) {
+        return compilationService.addCompilation(compilationInput);
+    }
+
+    @DeleteMapping("/compilations/{compId}")
+    public void deleteCompilation(@PathVariable long compId) {
+        compilationService.deleteCompilation(compId);
+    }
+
+    @PatchMapping("/compilations/{compId}")
+    public CompilationOutput updateCompilation(@PathVariable long compId, @Valid @RequestBody CompilationInput compilationInput) {
+        return compilationService.updateCompilation(compId, compilationInput);
+    }
 }

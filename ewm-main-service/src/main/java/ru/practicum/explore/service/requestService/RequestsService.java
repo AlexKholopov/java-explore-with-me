@@ -8,7 +8,7 @@ import ru.practicum.explore.model.exceptions.NotFoundException;
 import ru.practicum.explore.model.request.Request;
 import ru.practicum.explore.model.request.RequestOutput;
 import ru.practicum.explore.model.request.RequestStatus;
-import ru.practicum.explore.rest.event.ConfirmeRequestsInput;
+import ru.practicum.explore.model.request.ConfirmeRequestsInput;
 import ru.practicum.explore.service.userService.RequestMapper;
 
 import java.time.LocalDateTime;

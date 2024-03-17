@@ -1,4 +1,4 @@
-package ru.practicum.explore.rest.event;
+package ru.practicum.explore.model.request;
 
 import lombok.Data;
 import ru.practicum.explore.model.request.RequestStatus;

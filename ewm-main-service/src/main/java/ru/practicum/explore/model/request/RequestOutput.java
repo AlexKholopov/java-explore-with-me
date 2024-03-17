@@ -9,6 +9,6 @@ public class RequestOutput {
     private Long id;
     private LocalDateTime created;
     private long event;
-    private long participant;
+    private long requester;
     private RequestStatus status;
 }

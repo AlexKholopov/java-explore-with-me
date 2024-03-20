@@ -60,7 +60,7 @@ public class PrivateEventRestHandler {
 
     @PatchMapping("/{eventId}/requests")
     public GroupedRequestsOutput confirmRequest(@PathVariable Long eventId,
-                                              @Valid @RequestBody ConfirmeRequestsInput requestsInput) {
+                                                @Valid @RequestBody ConfirmeRequestsInput requestsInput) {
         return requestsService.updateRequestStatus(eventId, requestsInput);
     }
 }

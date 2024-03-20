@@ -34,8 +34,8 @@ public class CompilationService {
     private String serverUrl;
     private StatsClient statsClient;
     private final Gson gson = new Gson();
-    private final static LocalDateTime earliestTime = LocalDateTime.now().minusYears(500);
-    private final static LocalDateTime latestTime = LocalDateTime.now().plusYears(500);
+    private final LocalDateTime earliestTime = LocalDateTime.now().minusYears(500);
+    private final LocalDateTime latestTime = LocalDateTime.now().plusYears(500);
 
     @PostConstruct
     private void initStatsClient() {

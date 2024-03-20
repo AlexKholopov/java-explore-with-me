@@ -2,6 +2,8 @@ package ru.practicum.explore.service.eventService;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.explore.db.Dao;
@@ -18,6 +20,7 @@ import ru.practicum.explore.model.exceptions.ConflictException;
 import ru.practicum.explore.model.exceptions.NotFoundException;
 import ru.practicum.model.HitOutput;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,13 +29,21 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@PropertySource(value = "application.properties")
 public class EventService {
     private final Dao dao;
     private final EventMapper eventMapper;
     private final Gson gson = new Gson();
-    private final StatsClient statsClient = new StatsClient();
+    @Value("${server.url}")
+    private String serverUrl;
+    private StatsClient statsClient;
     private final static LocalDateTime earliestTime = LocalDateTime.now().minusYears(500);
     private final static LocalDateTime latestTime = LocalDateTime.now().plusYears(500);
+
+    @PostConstruct
+    private void initStatsClient() {
+         statsClient= new StatsClient(serverUrl);
+    }
 
     public EventOutput createEvent(Long userId, EventCreateDto eventInput) {
         if (eventInput.getRequestModeration() == null) eventInput.setRequestModeration(true);

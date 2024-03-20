@@ -151,7 +151,7 @@ public class Dao {
     }
 
     public List<Event> searchManyFiltersAdmin(List<User> users, List<EventState> states, List<Category> categories,
-                                         LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
+                                              LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
         Specification<Event> specification = Specification
                 .where(EventSpec.categoryIn(categories))
                 .and(EventSpec.userIn(users))

@@ -1,6 +1,5 @@
 package ru.practicum.explore.model.request;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

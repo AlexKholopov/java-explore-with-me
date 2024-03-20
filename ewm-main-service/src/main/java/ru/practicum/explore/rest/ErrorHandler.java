@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.explore.model.exceptions.ConflictException;
 import ru.practicum.explore.model.exceptions.NotFoundException;
 
-import javax.persistence.PersistenceException;
 import javax.validation.ValidationException;
 import java.util.Map;
 

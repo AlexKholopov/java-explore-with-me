@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface AdminEventDate {
     String message() default "Validation exception: The date and time on which the event is scheduled cannot be earlier than one hour from the current moment";
 
-    Class<?>[] groups() default { };
+    Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default { };
+    Class<? extends Payload>[] payload() default {};
 }

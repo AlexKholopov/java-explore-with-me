@@ -39,7 +39,7 @@ public class CompilationService {
 
     @PostConstruct
     private void initStatsClient() {
-        statsClient= new StatsClient(serverUrl);
+        statsClient = new StatsClient(serverUrl);
     }
 
 

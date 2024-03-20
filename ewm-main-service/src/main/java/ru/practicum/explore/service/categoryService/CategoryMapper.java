@@ -8,5 +8,6 @@ import ru.practicum.explore.model.category.CategoryDto;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface CategoryMapper {
     Category fromDto(CategoryDto categoryDto);
+
     CategoryDto toDto(Category category);
 }

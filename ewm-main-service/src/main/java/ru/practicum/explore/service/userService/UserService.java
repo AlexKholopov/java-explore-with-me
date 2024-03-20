@@ -9,7 +9,6 @@ import ru.practicum.explore.model.exceptions.ConflictException;
 import ru.practicum.explore.model.user.User;
 import ru.practicum.explore.model.user.UserDto;
 
-import javax.validation.ValidationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,7 @@ public class UserService {
     public void deleteUserById(long userId) {
         dao.deleteUserById(userId);
     }
+
     public List<UserDto> getUsers(List<Long> ids, int from, int size) {
         if (ids.isEmpty()) {
             return dao.getAllUsersPage(from, size).stream().map(userMapper::toDto).collect(Collectors.toList());

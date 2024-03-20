@@ -44,7 +44,7 @@ public class AdminRestHandler {
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser (@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
@@ -56,8 +56,8 @@ public class AdminRestHandler {
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam(required = false, defaultValue = "") List<Long> ids,
-                         @RequestParam(required = false, defaultValue = "0") int from,
-                         @RequestParam(required = false, defaultValue = "10") int size) {
+                                  @RequestParam(required = false, defaultValue = "0") int from,
+                                  @RequestParam(required = false, defaultValue = "10") int size) {
         return userService.getUsers(ids, from, size);
     }
 
@@ -88,7 +88,7 @@ public class AdminRestHandler {
         try {
             var rangeStartTime = rangeStart == null ? null : LocalDateTime.parse(rangeStart, dtf);
             var rangeEndTime = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, dtf);
-            return eventService.searchEventAdmin(users, states, categories,rangeStartTime, rangeEndTime, from, size);
+            return eventService.searchEventAdmin(users, states, categories, rangeStartTime, rangeEndTime, from, size);
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Wrong time format");
         }

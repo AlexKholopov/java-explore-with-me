@@ -42,7 +42,7 @@ public class EventService {
 
     @PostConstruct
     private void initStatsClient() {
-         statsClient= new StatsClient(serverUrl);
+        statsClient = new StatsClient(serverUrl);
     }
 
     public EventOutput createEvent(Long userId, EventCreateDto eventInput) {

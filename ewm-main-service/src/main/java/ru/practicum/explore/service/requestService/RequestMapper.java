@@ -1,4 +1,4 @@
-package ru.practicum.explore.service.userService;
+package ru.practicum.explore.service.requestService;
 
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

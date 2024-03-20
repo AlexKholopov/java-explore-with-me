@@ -36,6 +36,7 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
+    @ToString.Exclude
     private Set<Event> events;
 
     @Override

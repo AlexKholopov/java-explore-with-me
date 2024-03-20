@@ -22,5 +22,7 @@ public interface EventMapper {
     Event fromInput(EventCreateDto eventInput, Category category, User initiator, LocalDateTime createdOn, String location);
 
     @Mapping(target = "location", source = "location")
-    EventOutput toOutput(Event event, Location location);
+    @Mapping(target = "confirmedRequests", source = "confirmedRequests")
+    @Mapping(target = "views", source = "views")
+    EventOutput toOutput(Event event, Location location, long confirmedRequests, int views);
 }

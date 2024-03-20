@@ -1,6 +1,8 @@
 package ru.practicum.explore.rest.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +27,8 @@ public class RequestRestHandler {
     }
 
     @PostMapping
-    public RequestOutput createRequest(@PathVariable long userId, @RequestParam long eventId) {
-        return requestsService.saveRequest(userId, eventId);
+    public ResponseEntity<RequestOutput> createRequest(@PathVariable long userId, @RequestParam long eventId) {
+        return new ResponseEntity<>(requestsService.saveRequest(userId, eventId), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{requestId}/cancel")

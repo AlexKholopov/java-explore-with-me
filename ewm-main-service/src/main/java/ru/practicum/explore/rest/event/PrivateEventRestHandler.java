@@ -1,6 +1,8 @@
 package ru.practicum.explore.rest.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.explore.model.event.EventCreateDto;
 import ru.practicum.explore.model.event.EventOutput;
-import ru.practicum.explore.model.event.EventUpdateDto;
+import ru.practicum.explore.model.event.EventUpdateUserDto;
 import ru.practicum.explore.model.request.ConfirmeRequestsInput;
+import ru.practicum.explore.model.request.GroupedRequestsOutput;
 import ru.practicum.explore.model.request.RequestOutput;
 import ru.practicum.explore.service.eventService.EventService;
 import ru.practicum.explore.service.requestService.RequestsService;
@@ -36,8 +39,8 @@ public class PrivateEventRestHandler {
     }
 
     @PostMapping
-    public EventOutput createEvent(@PathVariable long userId, @Valid @RequestBody EventCreateDto eventCreateDto) {
-        return eventService.createEvent(userId, eventCreateDto);
+    public ResponseEntity<EventOutput> createEvent(@PathVariable long userId, @Valid @RequestBody EventCreateDto eventCreateDto) {
+        return new ResponseEntity<>(eventService.createEvent(userId, eventCreateDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{eventId}")
@@ -46,7 +49,7 @@ public class PrivateEventRestHandler {
     }
 
     @PatchMapping("/{eventId}")
-    public EventOutput updateEvent(@PathVariable long userId, @PathVariable long eventId, @Valid @RequestBody EventUpdateDto eventUpdateDto) {
+    public EventOutput updateEvent(@PathVariable long userId, @PathVariable long eventId, @Valid @RequestBody EventUpdateUserDto eventUpdateDto) {
         return eventService.updateEvent(userId, eventId, eventUpdateDto);
     }
 
@@ -56,7 +59,8 @@ public class PrivateEventRestHandler {
     }
 
     @PatchMapping("/{eventId}/requests")
-    public List<RequestOutput> confirmRequest(@Valid @RequestBody ConfirmeRequestsInput requestsInput) {
-        return requestsService.updateRequestStatus(requestsInput);
+    public GroupedRequestsOutput confirmRequest(@PathVariable Long eventId,
+                                              @Valid @RequestBody ConfirmeRequestsInput requestsInput) {
+        return requestsService.updateRequestStatus(eventId, requestsInput);
     }
 }

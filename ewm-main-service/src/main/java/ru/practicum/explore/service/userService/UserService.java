@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore.db.Dao;
+import ru.practicum.explore.model.exceptions.ConflictException;
 import ru.practicum.explore.model.user.User;
 import ru.practicum.explore.model.user.UserDto;
 
@@ -26,7 +27,7 @@ public class UserService {
             createdUser = dao.createUser(userToCreate);
             return userMapper.toDto(createdUser);
         } catch (DataIntegrityViolationException e) {
-            throw new ValidationException("duplicate");
+            throw new ConflictException("duplicate");
         }
     }
 

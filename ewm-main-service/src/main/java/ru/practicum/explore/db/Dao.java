@@ -13,8 +13,8 @@ import ru.practicum.explore.model.category.Category;
 import ru.practicum.explore.model.compilation.Compilation;
 import ru.practicum.explore.model.event.Event;
 import ru.practicum.explore.model.event.EventState;
-import ru.practicum.explore.model.event.EventUpdateDto;
 import ru.practicum.explore.model.request.Request;
+import ru.practicum.explore.model.request.RequestStatus;
 import ru.practicum.explore.model.user.User;
 
 import java.time.LocalDateTime;
@@ -33,26 +33,30 @@ public class Dao {
     public User createUser(User user) {
         return userRepo.save(user);
     }
+
     public void deleteUserById(long userId) {
         userRepo.deleteById(userId);
     }
+
     public List<User> getUsersByIdIn(List<Long> ids) {
         return userRepo.findByIdIn(ids);
     }
+
     public Optional<User> getUserById(Long id) {
         return userRepo.findById(id);
     }
+
     public List<User> getAllUsersPage(int from, int size) {
         int page = from % size > 0 ? (from / size) + 1 : from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
         return userRepo.findAll(pageRequest).toList();
     }
 
-    public Category  saveCategory(Category category) {
+    public Category saveCategory(Category category) {
         return categoryRepo.save(category);
     }
 
-    public Category getCategoryBId(long id) {
+    public Category getCategoryById(long id) {
         return categoryRepo.findById(id).orElse(null);
     }
 
@@ -93,12 +97,20 @@ public class Dao {
         return eventRepo.findById(eventId);
     }
 
+    public Event getPublishedEventById(long eventId) {
+        return eventRepo.findByIdAndState(eventId, EventState.PUBLISHED);
+    }
+
     public Request saveRequest(Request request) {
         return requestRepo.save(request);
     }
 
     public Optional<Request> getRequestById(long requestId) {
         return requestRepo.findById(requestId);
+    }
+
+    public Request getRequestByRequesterAndEvent(User requester, Event event) {
+        return requestRepo.findByRequesterAndEvent(requester, event);
     }
 
     public void deleteRequest(Request request) {
@@ -113,6 +125,10 @@ public class Dao {
         return requestRepo.findByEvent(event);
     }
 
+    public long getConfirmedRequests(Event event) {
+        return requestRepo.countByEventAndStatus(event, RequestStatus.CONFIRMED);
+    }
+
     public List<Request> findRequestsById(List<Long> requestsId) {
         return requestRepo.findByIdIn(requestsId);
     }
@@ -122,11 +138,26 @@ public class Dao {
                                          Boolean onlyAvailable, int from, int size) {
         Specification<Event> specification = Specification
                 .where(EventSpec.searchByText(text))
-                .and(EventSpec.CategoryIn(categories))
+                .and(EventSpec.categoryIn(categories))
                 .and(EventSpec.isPaid(paid))
                 .and(EventSpec.rangeStart(rangeStart))
                 .and(EventSpec.rangeEnd(rangeEnd))
                 .and(EventSpec.isAvailable(onlyAvailable));
+
+        int page = from % size > 0 ? (from / size) + 1 : from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return eventRepo.findAll(specification, pageRequest).toList();
+    }
+
+    public List<Event> searchManyFiltersAdmin(List<User> users, List<EventState> states, List<Category> categories,
+                                         LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
+        Specification<Event> specification = Specification
+                .where(EventSpec.categoryIn(categories))
+                .and(EventSpec.userIn(users))
+                .and(EventSpec.stateIn(states))
+                .and(EventSpec.rangeStart(rangeStart))
+                .and(EventSpec.rangeEnd(rangeEnd));
 
         int page = from % size > 0 ? (from / size) + 1 : from / size;
         PageRequest pageRequest = PageRequest.of(page, size);

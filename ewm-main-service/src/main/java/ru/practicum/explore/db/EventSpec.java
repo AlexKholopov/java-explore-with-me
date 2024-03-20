@@ -4,6 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import ru.practicum.explore.model.category.Category;
 import ru.practicum.explore.model.event.Event;
+import ru.practicum.explore.model.event.EventState;
+import ru.practicum.explore.model.user.User;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
@@ -18,12 +20,42 @@ public class EventSpec {
             return null;
         }
         return Specification.where(like(search, "annotation"))
-                .or(like(search, "description"));
+                .or(like(search, "description"))
+                .or(like(search, "title"));
     }
 
-    public static Specification<Event> CategoryIn(List<Category> searchExpressions) {
+    public static Specification<Event> categoryIn(List<Category> searchExpressions) {
+        if (Objects.isNull(searchExpressions)) {
+            return null;
+        }
         return ((root, query, criteriaBuilder) -> {
             CriteriaBuilder.In<Category> inClause = criteriaBuilder.in(root.get("category"));
+            for (var searchExpression : searchExpressions) {
+                inClause.value(searchExpression);
+            }
+            return inClause;
+        });
+    }
+
+    public static Specification<Event> stateIn(List<EventState> searchExpressions) {
+        if (Objects.isNull(searchExpressions)) {
+            return null;
+        }
+        return ((root, query, criteriaBuilder) -> {
+            CriteriaBuilder.In<EventState> inClause = criteriaBuilder.in(root.get("state"));
+            for (var searchExpression : searchExpressions) {
+                inClause.value(searchExpression);
+            }
+            return inClause;
+        });
+    }
+
+    public static Specification<Event> userIn(List<User> searchExpressions) {
+        if (Objects.isNull(searchExpressions)) {
+            return null;
+        }
+        return ((root, query, criteriaBuilder) -> {
+            CriteriaBuilder.In<User> inClause = criteriaBuilder.in(root.get("initiator"));
             for (var searchExpression : searchExpressions) {
                 inClause.value(searchExpression);
             }
@@ -39,7 +71,7 @@ public class EventSpec {
     }
 
     public static Specification<Event> isAvailable(Boolean available) {
-        if (Objects.isNull(available)) {
+        if (Objects.isNull(available) || !available) {
             return null;
         }
         return ((root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("available")));
@@ -49,7 +81,10 @@ public class EventSpec {
         if (Objects.isNull(start)) {
             return null;
         }
-        return ((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), start));
+        return ((root, query, criteriaBuilder) -> {
+            var time = root.get("eventDate");
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), start);
+        });
     }
 
     public static Specification<Event> rangeEnd(LocalDateTime end) {
@@ -73,10 +108,10 @@ public class EventSpec {
             return null;
         }
 
-        String modified = query.trim().replaceAll(" ", "").toLowerCase();
+        String modified = query.toLowerCase();
         if (modified.length() < SEARCH_MIN_LENGTH) {
             return null;
         }
-        return '%' + modified + '%';
+        return modified;
     }
 }

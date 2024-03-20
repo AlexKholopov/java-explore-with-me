@@ -3,13 +3,19 @@ package ru.practicum.explore.service.copilationService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.StatsClient;
 import ru.practicum.explore.db.Dao;
-import ru.practicum.explore.model.compilation.CompilationInput;
+import ru.practicum.explore.model.compilation.CompilationInputCreate;
+import ru.practicum.explore.model.compilation.CompilationInputUpdate;
 import ru.practicum.explore.model.compilation.CompilationOutput;
+import ru.practicum.explore.model.event.Event;
 import ru.practicum.explore.model.event.Location;
 import ru.practicum.explore.model.exceptions.NotFoundException;
 import ru.practicum.explore.service.eventService.EventMapper;
+import ru.practicum.model.HitOutput;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,21 +26,25 @@ public class CompilationService {
     private final Dao dao;
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
+    private final StatsClient statsClient = new StatsClient();
     private final Gson gson = new Gson();
+    private final static LocalDateTime earliestTime = LocalDateTime.now().minusYears(500);
+    private final static LocalDateTime latestTime = LocalDateTime.now().plusYears(500);
 
 
-    public CompilationOutput addCompilation(CompilationInput compilationInput) {
-        var events = dao.getEventsByIds(compilationInput.getEvents());
-        var compilation = compilationMapper.fromInput(compilationInput, events);
+    public CompilationOutput addCompilation(CompilationInputCreate compilationInputCreate) {
+        var events = compilationInputCreate.getEvents() == null ? null : dao.getEventsByIds(compilationInputCreate.getEvents());
+        if (compilationInputCreate.getPinned() == null) compilationInputCreate.setPinned(false);
+        var compilation = compilationMapper.fromInput(compilationInputCreate, events);
         var savedCompilation = dao.saveCompilation(compilation);
-        var compilationOutput = new CompilationOutput();
-        compilationOutput.setEvents(savedCompilation.getEvents().stream().map(event -> {
+        var uris = events == null ? new ArrayList<String>() : events.stream().map(it -> String.format("/events/%s", it.getId())).collect(Collectors.toList());
+        var stats = statsClient.getHits(earliestTime, latestTime, uris, true).stream()
+                .collect(Collectors.toMap((HitOutput it) -> it.getUri().substring(it.getUri().lastIndexOf("/") + 1), (HitOutput::getHits)));
+        var eventsOut = savedCompilation.getEvents() == null ? null : savedCompilation.getEvents().stream().map(event -> {
             Location location = gson.fromJson(event.getLocation(), Location.class);
-            return eventMapper.toOutput(event, location);
-        }).collect(Collectors.toList()));
-        compilationOutput.setTitle(compilationOutput.getTitle());
-        compilationOutput.setTitle(compilation.getTitle());
-        return compilationOutput;
+            return eventMapper.toOutput(event, location, dao.getConfirmedRequests(event), stats.getOrDefault(String.format("/events/%s", event.getId()), 0));
+        }).collect(Collectors.toList());
+        return compilationMapper.toOutput(savedCompilation, eventsOut);
     }
 
     public void deleteCompilation(Long compilationId) {
@@ -42,29 +52,48 @@ public class CompilationService {
         dao.deleteCompilation(compilation);
     }
 
-    public CompilationOutput updateCompilation(Long compilationId, CompilationInput compilationInput) {
+    public CompilationOutput updateCompilation(Long compilationId, CompilationInputUpdate compilationInputUpdate) {
         var compilation = dao.getCompilationById(compilationId).orElseThrow(() -> new NotFoundException("No such compilation was found"));
-        var events = dao.getEventsByIds(compilationInput.getEvents());
-        var updatedCompilation = compilationMapper.fromInput(compilationInput, events);
+        var events = compilationInputUpdate.getEvents() == null ? null : dao.getEventsByIds(compilationInputUpdate.getEvents());
+        var updatedCompilation = compilationMapper.fromInput(compilationInputUpdate, events);
         updatedCompilation.setId(compilationId);
         var savedCompilation = dao.saveCompilation(updatedCompilation);
-        var compilationOutput = new CompilationOutput();
-        compilationOutput.setEvents(savedCompilation.getEvents().stream().map(event -> {
+        var uris = events == null ? new ArrayList<String>() : events.stream().map(it -> String.format("/events/%s", it.getId())).collect(Collectors.toList());
+        var stats = statsClient.getHits(earliestTime, latestTime, uris, true).stream()
+                .collect(Collectors.toMap((HitOutput it) -> it.getUri().substring(it.getUri().lastIndexOf("/") + 1), (HitOutput::getHits)));
+        var eventsOut = savedCompilation.getEvents() == null ? null : savedCompilation.getEvents().stream().map(event -> {
             Location location = gson.fromJson(event.getLocation(), Location.class);
-            return eventMapper.toOutput(event, location);
-        }).collect(Collectors.toList()));
-        compilationOutput.setTitle(compilationOutput.getTitle());
-        compilationOutput.setTitle(compilation.getTitle());
-        return compilationOutput;
+            return eventMapper.toOutput(event, location, dao.getConfirmedRequests(event), stats.getOrDefault(String.format("/events/%s", event.getId()), 0));
+        }).collect(Collectors.toList());
+        return compilationMapper.toOutput(savedCompilation, eventsOut);
     }
 
     public List<CompilationOutput> getCompilations(Boolean pinned, int from, int size) {
-        return dao.findCompilations(pinned, from, size).stream().map(it -> {
-            var eventsOut = it.getEvents().stream().map(event -> {
+        var compilations = dao.findCompilations(pinned, from, size);
+        List<String> uris = new ArrayList<>();
+        for (var comp : compilations) {
+            uris.addAll(comp.getEvents().stream().map(it -> String.format("/events/%s", it.getId())).collect(Collectors.toList()));
+        }
+        var stats = statsClient.getHits(earliestTime, latestTime, uris, true).stream()
+                .collect(Collectors.toMap((HitOutput it) -> it.getUri().substring(it.getUri().lastIndexOf("/") + 1), (HitOutput::getHits)));
+        return compilations.stream().map(it -> {
+            var eventsOut = it.getEvents().stream().map((Event event) -> {
                 Location location = gson.fromJson(event.getLocation(), Location.class);
-                return eventMapper.toOutput(event, location);
+                return eventMapper.toOutput(event, location, dao.getConfirmedRequests(event), stats.getOrDefault(String.format("/events/%s", event.getId()), 0));
             }).collect(Collectors.toList());
             return compilationMapper.toOutput(it, eventsOut);
         }).collect(Collectors.toList());
+    }
+
+    public CompilationOutput getCompilation(Long compId) {
+        var comp = dao.getCompilationById(compId).orElseThrow(() -> new NotFoundException("No such compilation was found"));
+        var uris = comp.getEvents().stream().map(it -> String.format("/events/%s", it.getId())).collect(Collectors.toList());
+        var stats = statsClient.getHits(earliestTime, latestTime, uris, true).stream()
+                .collect(Collectors.toMap((HitOutput it) -> it.getUri().substring(it.getUri().lastIndexOf("/") + 1), (HitOutput::getHits)));
+        var eventsOut = comp.getEvents().stream().map((Event event) -> {
+            Location location = gson.fromJson(event.getLocation(), Location.class);
+            return eventMapper.toOutput(event, location, dao.getConfirmedRequests(event), stats.getOrDefault(String.format("/events/%s", event.getId()), 0));
+        }).collect(Collectors.toList());
+        return compilationMapper.toOutput(comp, eventsOut);
     }
 }

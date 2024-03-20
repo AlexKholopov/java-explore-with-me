@@ -2,7 +2,6 @@ package ru.practicum.explore.db;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.explore.model.compilation.Compilation;
-import ru.practicum.explore.model.event.Event;
 
 import java.util.Objects;
 

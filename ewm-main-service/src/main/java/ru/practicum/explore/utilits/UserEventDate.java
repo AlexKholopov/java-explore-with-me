@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EventDateValidator.class)
-public @interface EventDate {
+@Constraint(validatedBy = UserEventDateValidator.class)
+public @interface UserEventDate {
 
-    String message() default "Validation exception: The date and time on which the event is scheduled cannot be earlier than two hours from the current moment.";
+    String message() default "Validation exception: The date and time on which the event is scheduled cannot be earlier than two hours from the current moment";
 
     Class<?>[] groups() default { };
 

@@ -50,8 +50,6 @@ public class Event {
     private Category category;
     @Enumerated(EnumType.STRING)
     private EventState state;
-    @Enumerated(EnumType.STRING)
-    private EventStateAction stateAction;
     private boolean available;
     @ManyToMany(mappedBy = "events")
     private Set<Compilation> compilations;

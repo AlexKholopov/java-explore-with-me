@@ -1,5 +1,6 @@
 package ru.practicum.explore.model.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import ru.practicum.explore.model.category.CategoryDto;
 import ru.practicum.explore.model.user.UserOutput;
@@ -11,9 +12,10 @@ public class EventOutput {
     private long id;
     private String annotation;
     private CategoryDto category;
-    private int confirmedRequests;
+    private long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private UserOutput initiator;
     private Location location;

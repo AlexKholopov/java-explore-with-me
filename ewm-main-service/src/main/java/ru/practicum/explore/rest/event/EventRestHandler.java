@@ -10,7 +10,9 @@ import ru.practicum.explore.model.event.EventOutput;
 import ru.practicum.explore.model.event.EventSort;
 import ru.practicum.explore.service.eventService.EventService;
 
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -19,18 +21,27 @@ import java.util.List;
 public class EventRestHandler {
 
     private final EventService eventService;
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping
     public List<EventOutput> findEvents(@RequestParam(required = false) String text,
                                         @RequestParam(required = false) List<Long> categories,
                                         @RequestParam(required = false) Boolean paid,
-                                        @RequestParam(required = false) LocalDateTime rangeStart,
-                                        @RequestParam(required = false) LocalDateTime rangeEnd,
+                                        @RequestParam(required = false) String rangeStart,
+                                        @RequestParam(required = false) String rangeEnd,
                                         @RequestParam(required = false) Boolean onlyAvailable,
                                         @RequestParam(required = false, defaultValue = "VIEWS") EventSort sort,
                                         @RequestParam(required = false, defaultValue = "0") int from,
                                         @RequestParam(required = false, defaultValue = "10") int size) {
-        return eventService.searchEvent(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        try {
+            var rangeStartTime = rangeStart == null ? null : LocalDateTime.parse(rangeStart, dtf);
+            var rangeEndTime = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, dtf);
+            if (rangeStartTime != null && rangeEndTime != null && rangeEndTime.isBefore(rangeStartTime))
+                throw new ValidationException("Start time must be earlie than end time");
+            return eventService.searchEvent(text, categories, paid, rangeStartTime, rangeEndTime, onlyAvailable, sort, from, size);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Wrong time format");
+        }
     }
 
     @GetMapping("/{eventId}")

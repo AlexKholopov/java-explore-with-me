@@ -1,5 +1,5 @@
 package ru.practicum.explore.utilits;
 
 public class Constants {
-    public final static String PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
 }

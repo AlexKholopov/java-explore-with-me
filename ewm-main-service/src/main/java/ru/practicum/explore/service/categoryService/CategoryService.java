@@ -63,7 +63,7 @@ public class CategoryService {
         if (cat == null) throw new NotFoundException("No such category was found");
         return categoryMapper.toDto(cat);
     }
- 
+
     private List<Category> getAllCategoriesPage(int from, int size) {
         int page = from % size > 0 ? (from / size) + 1 : from / size;
         PageRequest pageRequest = PageRequest.of(page, size);

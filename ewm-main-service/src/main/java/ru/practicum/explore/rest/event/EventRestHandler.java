@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.explore.model.event.EventOutput;
 import ru.practicum.explore.model.event.EventSort;
 import ru.practicum.explore.service.eventService.EventService;
+import ru.practicum.explore.utilits.Constants;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import java.util.List;
 public class EventRestHandler {
 
     private final EventService eventService;
-    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.PATTERN);
 
     @GetMapping
     public List<EventOutput> findEvents(@RequestParam(required = false) String text,

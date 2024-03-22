@@ -25,6 +25,7 @@ import ru.practicum.explore.service.categoryService.CategoryService;
 import ru.practicum.explore.service.copilationService.CompilationService;
 import ru.practicum.explore.service.eventService.EventService;
 import ru.practicum.explore.service.userService.UserService;
+import ru.practicum.explore.utilits.Constants;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -41,7 +42,7 @@ public class AdminRestHandler {
     private final CategoryService categoryService;
     private final CompilationService compilationService;
     private final EventService eventService;
-    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.PATTERN);
 
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {

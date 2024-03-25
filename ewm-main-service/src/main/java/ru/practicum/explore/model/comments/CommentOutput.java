@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class CommentOutput {
     private Long id;
     private String userName;
-    private String Comment;
+    private String comment;
     private Boolean updated;
     private LocalDateTime lastUpdate;
 }

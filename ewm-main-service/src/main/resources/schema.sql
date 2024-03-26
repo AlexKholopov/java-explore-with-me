@@ -81,8 +81,6 @@ ALTER TABLE requests ADD CONSTRAINT FK_REQUESTS_ON_PARTICIPANT FOREIGN KEY (requ
 
 CREATE INDEX category_name ON category(lower(name));
 
-CREATE INDEX events_annotation ON events(lower(annotation));
-CREATE INDEX events_description ON events(lower(description));
 CREATE INDEX events_created_on ON events(created_on);
 CREATE INDEX events_event_date ON events(created_on);
 CREATE INDEX events_title ON events(lower(title));

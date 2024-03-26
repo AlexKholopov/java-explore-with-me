@@ -78,3 +78,14 @@ ALTER TABLE events ADD CONSTRAINT FK_EVENTS_ON_CATEGORY FOREIGN KEY (category) R
 ALTER TABLE events ADD CONSTRAINT FK_EVENTS_ON_INITIATOR FOREIGN KEY (initiator) REFERENCES users (id);
 ALTER TABLE requests ADD CONSTRAINT FK_REQUESTS_ON_EVENT FOREIGN KEY (event) REFERENCES events (id);
 ALTER TABLE requests ADD CONSTRAINT FK_REQUESTS_ON_PARTICIPANT FOREIGN KEY (requester) REFERENCES users (id);
+
+CREATE INDEX category_name ON category(lower(name));
+
+CREATE INDEX events_annotation ON events(lower(annotation));
+CREATE INDEX events_description ON events(lower(description));
+CREATE INDEX events_created_on ON events(created_on);
+CREATE INDEX events_event_date ON events(created_on);
+CREATE INDEX events_title ON events(lower(title));
+CREATE INDEX events_participant_limit ON events(participant_limit);
+
+CREATE INDEX compilations_title ON compilations(lower(title));
